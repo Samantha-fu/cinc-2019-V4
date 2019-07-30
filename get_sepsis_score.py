@@ -37,20 +37,22 @@ AB_features_mean_dict={'AST': 356.2075296108291,
  'TroponinI': 9.288186528497409,
  'WBC': 11.936603760868179,
  'pH': 7.380242785410664}
-  all_columns=['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'EtCO2', 'BaseExcess', 'HCO3', 'FiO2', 'pH', 'PaCO2', 'SaO2', 'AST', 'BUN', 'Alkalinephos', 'Calcium', 'Chloride', 'Creatinine', 'Bilirubin_direct', 'Glucose', 'Lactate', 'Magnesium', 'Phosphate', 'Potassium', 'Bilirubin_total', 'TroponinI', 'Hct', 'Hgb', 'PTT', 'WBC', 'Fibrinogen', 'Platelets', 'Age', 'Gender', 'Unit1', 'Unit2', 'HospAdmTime', 'ICULOS']
+all_columns=['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'EtCO2', 'BaseExcess', 'HCO3', 'FiO2', 'pH', 'PaCO2', 'SaO2', 'AST', 'BUN', 'Alkalinephos', 'Calcium', 'Chloride', 'Creatinine', 'Bilirubin_direct', 'Glucose', 'Lactate', 'Magnesium', 'Phosphate', 'Potassium', 'Bilirubin_total', 'TroponinI', 'Hct', 'Hgb', 'PTT', 'WBC', 'Fibrinogen', 'Platelets', 'Age', 'Gender', 'Unit1', 'Unit2', 'HospAdmTime', 'ICULOS']
 def fill_null_with_mean(data):
-    data=pd.DataFrame(data,columns= all_columns)
+    df=pd.DataFrame(data,columns= all_columns)
     feature_name=[i for i in all_columns if i not in ["BaseExcess","Gender","EtCO2","Unit1","Unit2","HospAdmTime"]]
     for col in feature_name:
         if col=="SepsisLabel":
             continue
         else:
-            """df[col].fillna(method="pad",inplace=True)#padding with before data"""
-            df[col].fillna(AB_features_mean_dict[col],inplace=True) #if first is null fill mean data
+           # df[col].fillna(method="pad",inplace=True)#padding with before data"""
+            #print(df.isnull())
+            df[col].fillna(AB_features_mean_dict[col],inplace=True) # fill mean data
     return np.array(df[feature_name][0:])
   
 def get_sepsis_score(current_data,model):#current
     data=fill_null_with_mean(current_data)
+    print("start predict the {}th hour of data".format(data.shape[0]))
     new_array=np.zeros((1,(data.shape[1])*5))
     array_data=np.array(data) 
     if data.shape[0]==1:
@@ -61,14 +63,14 @@ def get_sepsis_score(current_data,model):#current
     else:
         trend_data=(np.diff(array_data.T))[:,-1].reshape(1,-1)   
         add_data=np.concatenate((array_data[-1].reshape(1,-1),trend_data,array_data.min(axis=0).reshape(1,-1),array_data.max(axis=0).reshape(1,-1),array_data.mean(axis=0).reshape(1,-1)),axis=1)
-    print("add_data.shape:",add_data.shape)
+    #print("add_data.shape:",add_data.shape)
     if add_data.shape[1]==170:
         score =model.predict_proba(add_data)[:,1]
-        label = score > 0.4
-    return score,label
+        label = score > 0.45
+        return score,label
     else:
         print("the shape is not match 170 ,check")
-    return None
+        return None
 def load_sepsis_model():
     model =joblib.load("./train56000_model.m")
     return model
