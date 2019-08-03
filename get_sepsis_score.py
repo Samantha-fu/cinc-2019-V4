@@ -67,7 +67,7 @@ def get_sepsis_score(current_data,model):#current
     #print("add_data.shape:",add_data.shape)
     if add_data.shape[1]==170:
         score =model.predict_proba(add_data)[:,1]
-        label = score > 0.45
+        label = score > 0.5
         return score,label
     else:
         print("the shape is not match 170 ,check")
