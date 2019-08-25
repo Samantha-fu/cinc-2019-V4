@@ -8,16 +8,15 @@ COPY ./ /physionet2019
 WORKDIR /physionet2019
 
 ## Install your dependencies here using apt-get etc.
-RUN apt-get update && \
-    apt-get install -y python-numpy \
-                       python-scipy \
-                       python-matplotlib \
-                       ipython \                       
-                       python-pandas \
-                       python-sympy \
-                       python-nose \
-    && apt-get clean \
-    && apt-get autoclean 
+#RUN apt-get update && \
+ #   apt-get install -y python-numpy \
+     ##                  python-scipy \
+   #                    ipython \                       
+      #                 python-pandas \
+      #                 python-sympy \
+      #                 python-nose \
+  #  && apt-get clean \
+ #   && apt-get autoclean 
 
 ## Do not edit if you have a requirements.txt
 RUN pip install -r requirements.txt
