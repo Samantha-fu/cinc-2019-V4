@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import numpy as np, os, sys
 import lightgbm
 from get_sepsis_score import load_sepsis_model, get_sepsis_score
